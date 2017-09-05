@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Test" parallel="false">
+    <parameter name="filePath" value="D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx"/>
+    <test name="Test A">
+        <classes>
+            <class name="com.demo.testng.TestNG"/>
+        </classes>
+    </test>
+
+</suite>

@@ -1,0 +1,10 @@
+/target
+/.settings
+/.classpath
+/.project
+/.idea
+/*.iml
+/out
+/logs
+/log4j
+/log4j_error

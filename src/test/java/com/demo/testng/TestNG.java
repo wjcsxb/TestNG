@@ -8,6 +8,7 @@ import com.jayway.restassured.parsing.Parser;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ValidatableResponse;
+import com.sun.xml.internal.bind.v2.TODO;
 import netscape.javascript.JSUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -44,6 +45,10 @@ public class TestNG implements ITest {
     private String     template;
     private double totalcase  = 0;
     private double failedcase = 0;
+    private static final String IS_SUCCESS = "0";
+    private static final String EQUAL_TO = "1";
+    private static final String HAS_ITEMS = "2";
+    private static final String ALL_MATCH = "3";
 
     //    String filePath = "D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx";
 
@@ -219,24 +224,34 @@ public class TestNG implements ITest {
      * */
     @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = true)
     public void restAssured(String ID, String testCase) throws JSONException {
-        String equalField = myBaselineData.get_record(ID).get("EqualFields");
-        String hasItemField = myBaselineData.get_record(ID).get("HasItemsFields");
-        String allMatchField = myBaselineData.get_record(ID).get("AllMatch");
+        String expectedResponse = myBaselineData.get_record(ID).get("ExpectedResponse");
+        String type = myBaselineData.get_record(ID).get("Type");
         String url = myInputData.get_record(ID).get("host") + myInputData.get_record(ID).get("call_suff");
         ValidatableResponse rep = getResponse(url);
         DataWriter.writeData(outputSheet,((ValidatableResponseImpl) rep).body().extract().response().asString(),ID,testCase);
 
-        if(ValidateUtils.isEmpty(equalField + hasItemField + allMatchField)){
-            DataWriter.writeData(wb, resultSheet, ID, testCase, "excel中EqualFields,HasItemsFields,AllMatch未配置");
+        String msg = "";
+        if(ValidateUtils.isEmpty(type)){
+            DataWriter.writeData(wb,resultSheet,ID,testCase,"excel中Type未配置!");
             return;
         }
-        String msg = "";
-        //TODO  测试 EqualField   字段数据匹配
-        msg = msg + equalTest(equalField,rep);
-        //TODO  测试 HasItemField  字段数据包含
-        msg = msg + hasItemsTest(hasItemField, rep);
-        //TODO  测试 AllMatch      完全匹配
-        msg = msg + allMatchTest(allMatchField, rep);
+        if(type.equals(IS_SUCCESS)){
+            //TODO 接口是否有数据
+            int statusCode = rep.extract().response().getStatusCode();
+            msg = statusCode == 200 ? msg : msg + statusCode;
+        }else if(type.equals(EQUAL_TO)){
+            //TODO  测试 EqualField   字段数据匹配
+            msg = equalTest(expectedResponse,rep);
+        }else if(type.equals(HAS_ITEMS)){
+            //TODO  测试 HasItemField  字段数据包含
+            msg = hasItemsTest(expectedResponse,rep);
+        }else if(type.equals(ALL_MATCH)){
+            //TODO  测试 AllMatch      完全匹配
+            msg = allMatchTest(expectedResponse,rep);
+        }else{
+            msg = "Type is not defined!";
+        }
+        msg = msg + rep.extract().response().getContentType();
         DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
     }
 
@@ -246,8 +261,8 @@ public class TestNG implements ITest {
 
     private String equalTest(String field,ValidatableResponse rep){
         String msg = "";
-        if(field == null || field.length() == 0){
-            logger.info("excel中EqualFields未配置！");
+        if(ValidateUtils.isEmpty(field)){
+            logger.info("excel中ExpectedResponse未配置！");
             return  msg;
         }
         String[] fields = field.split(",");
@@ -269,14 +284,17 @@ public class TestNG implements ITest {
             }catch(AssertionError e){
                 msg = e.toString();
                 break;
+            }catch (Exception e1){
+                msg = e1.toString();
+                break;
             }
         }
         return msg;
     }
     private String hasItemsTest(String field,ValidatableResponse rep) throws JSONException {
         String msg = "";
-        if(field == null || field.length() == 0){
-            logger.info("excel中HasItemsFields未配置！");
+        if(ValidateUtils.isEmpty(field)){
+            logger.info("excel中ExpectedResponse未配置！");
             return msg;
         }
         String[] fields = field.split("&");
@@ -302,6 +320,9 @@ public class TestNG implements ITest {
             }catch (AssertionError e){
                 msg = e.toString();
                 break;
+            }catch (Exception e1){
+                msg = e1.toString();
+                break;
             }
         }
         return msg;
@@ -309,8 +330,8 @@ public class TestNG implements ITest {
 
     private String allMatchTest(String expectStr,ValidatableResponse rep){
         String msg = "";
-        if(expectStr == null || expectStr.length() == 0){
-            logger.info("excel中AllMatch未配置！");
+        if(ValidateUtils.isEmpty(expectStr)){
+            logger.info("excel中ExpectedResponse未配置！");
             return msg;
         }
         try{

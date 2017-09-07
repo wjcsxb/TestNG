@@ -103,9 +103,9 @@ public class TestNG implements ITest {
         Map<String, RecordHandler> myInput = myInputData.get_map();
         //        System.out.println(myInput.get("1").get_map());
         // sort map in order so that test cases ran in a fixed order
-        Map<String, RecordHandler> sortmap = new HashMap<>();
+        List<Map.Entry<String, RecordHandler>> sortMap = Utils.sortMap(myInput);
 
-        for (Map.Entry<String, RecordHandler> entry : myInput.entrySet()) {
+        for (Map.Entry<String,RecordHandler> entry : sortMap) {
             String test_ID = entry.getKey();
             //            System.out.println(test_ID);
             String test_case = entry.getValue().get("TestCase");
@@ -226,19 +226,24 @@ public class TestNG implements ITest {
      * RestAssured + TestNG 测试
      * */
     @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = true)
-    public void restAssured(String ID, String testCase) throws JSONException {
+    public void restAssured(String ID, String testCase) {
         String expectedResponse = myBaselineData.getRecord(ID).get("ExpectedResponse");
         String type = myBaselineData.getRecord(ID).get("Type");
         String url = myInputData.getRecord(ID).get("host") + myInputData.getRecord(ID).get("call_suff");
         String contentType = myInputData.getRecord(ID).get("Content-Type");
 
         RestAssured.registerParser(contentType,Parser.JSON);
-        ValidatableResponse rep = getResponse(url);
-        DataWriter.writeData(outputSheet,((ValidatableResponseImpl) rep).body().extract().response().asString(),ID,testCase);
-
         String msg = "";
-        msg = getTestMsg(type,expectedResponse,rep);
-        msg = msg + rep.extract().response().getContentType();
+
+        try {
+            ValidatableResponse rep = getResponse(url);
+            DataWriter.writeData(outputSheet, ((ValidatableResponseImpl) rep).body().extract().response().asString(), ID, testCase);
+
+            msg = getTestMsg(type, expectedResponse, rep);
+//            msg = msg + rep.extract().response().getContentType();
+        }catch (Exception e){
+            msg = msg + " URL请求失败 " +e.getMessage();
+        }
         DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
     }
 
@@ -274,7 +279,7 @@ public class TestNG implements ITest {
         }
         return msg;
     }
-    private String hasItemsTest(String field,ValidatableResponse rep) throws JSONException {
+    private String hasItemsTest(String field,ValidatableResponse rep)  {
         String msg = "";
         String[] fields = field.split("&");
         for( String s : fields ){
@@ -317,7 +322,7 @@ public class TestNG implements ITest {
         return msg;
     }
 
-    private String getTestMsg(String type ,String expectedResponse ,ValidatableResponse rep ) throws JSONException {
+    private String getTestMsg(String type ,String expectedResponse ,ValidatableResponse rep ){
         if(ValidateUtils.isEmpty(type)){
             logger.info("excel中Type未配置！");
             return  "excel中Type未配置";

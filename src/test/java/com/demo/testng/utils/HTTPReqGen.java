@@ -206,6 +206,7 @@ public class HTTPReqGen {
             for(Map.Entry<String, String> entry: cookie_list.entrySet()) {
                 reqSpec.cookie(entry.getKey(), entry.getValue());
             }
+//            reqSpec.contentType("application/json");
 
             switch(call_type) {
 

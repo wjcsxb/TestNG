@@ -93,8 +93,6 @@ public class TestNG implements ITest {
         }
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         startTime = sf.format(new Date());
-
-        RestAssured.registerParser("application/json", Parser.JSON);
     }
 
     @DataProvider(name = "WorkBookData")
@@ -136,7 +134,12 @@ public class TestNG implements ITest {
         } catch (Exception e) {
             Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
         }
-        String baseline_message = myBaselineData.get_record(ID).get("Response");
+        String baseline_message = myBaselineData.get_record(ID).get("ExpectedResponse");
+        String type = myBaselineData.get_record(ID).get("Type");
+        if(!type.equals(ALL_MATCH)){
+            DataWriter.writeData(wb,resultSheet,ID,testCase,"is not AllMatch");
+            return;
+        }
         String msg = "";
         if (response.statusCode() == 200) {
             try {
@@ -227,31 +230,15 @@ public class TestNG implements ITest {
         String expectedResponse = myBaselineData.get_record(ID).get("ExpectedResponse");
         String type = myBaselineData.get_record(ID).get("Type");
         String url = myInputData.get_record(ID).get("host") + myInputData.get_record(ID).get("call_suff");
+        String contentType = myInputData.get_record(ID).get("Content-Type");
+        RestAssured.registerParser(contentType,Parser.JSON);
+
         ValidatableResponse rep = getResponse(url);
         DataWriter.writeData(outputSheet,((ValidatableResponseImpl) rep).body().extract().response().asString(),ID,testCase);
 
         String msg = "";
-        if(ValidateUtils.isEmpty(type)){
-            DataWriter.writeData(wb,resultSheet,ID,testCase,"excel中Type未配置!");
-            return;
-        }
-        if(type.equals(IS_SUCCESS)){
-            //TODO 接口是否有数据
-            int statusCode = rep.extract().response().getStatusCode();
-            msg = statusCode == 200 ? msg : msg + statusCode;
-        }else if(type.equals(EQUAL_TO)){
-            //TODO  测试 EqualField   字段数据匹配
-            msg = equalTest(expectedResponse,rep);
-        }else if(type.equals(HAS_ITEMS)){
-            //TODO  测试 HasItemField  字段数据包含
-            msg = hasItemsTest(expectedResponse,rep);
-        }else if(type.equals(ALL_MATCH)){
-            //TODO  测试 AllMatch      完全匹配
-            msg = allMatchTest(expectedResponse,rep);
-        }else{
-            msg = "Type is not defined!";
-        }
-        msg = msg + rep.extract().response().getContentType();
+        msg = getTestMsg(type,expectedResponse,rep);
+//        msg = msg + rep.extract().response().getContentType();
         DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
     }
 
@@ -261,10 +248,6 @@ public class TestNG implements ITest {
 
     private String equalTest(String field,ValidatableResponse rep){
         String msg = "";
-        if(ValidateUtils.isEmpty(field)){
-            logger.info("excel中ExpectedResponse未配置！");
-            return  msg;
-        }
         String[] fields = field.split(",");
         for(String s:fields){
             String[] strings = s.split("=");
@@ -293,10 +276,6 @@ public class TestNG implements ITest {
     }
     private String hasItemsTest(String field,ValidatableResponse rep) throws JSONException {
         String msg = "";
-        if(ValidateUtils.isEmpty(field)){
-            logger.info("excel中ExpectedResponse未配置！");
-            return msg;
-        }
         String[] fields = field.split("&");
         for( String s : fields ){
             String[] strings = s.split("=");
@@ -314,7 +293,7 @@ public class TestNG implements ITest {
                         }
                     }
                 }else {
-                    msg = "Expected" + strings[0] + "is null or not ArrayList.";
+                    msg = "Expected " + strings[0] + " is null or not ArrayList.";
                     break;
                 }
             }catch (AssertionError e){
@@ -330,16 +309,39 @@ public class TestNG implements ITest {
 
     private String allMatchTest(String expectStr,ValidatableResponse rep){
         String msg = "";
-        if(ValidateUtils.isEmpty(expectStr)){
-            logger.info("excel中ExpectedResponse未配置！");
-            return msg;
-        }
         try{
             rep.body(equalTo(expectStr));
         }catch (AssertionError e){
             msg = e.toString();
         }
         return msg;
+    }
+
+    private String getTestMsg(String type ,String expectedResponse ,ValidatableResponse rep ) throws JSONException {
+        if(ValidateUtils.isEmpty(type)){
+            logger.info("excel中Type未配置！");
+            return  "excel中Type未配置";
+        }
+        if(ValidateUtils.isEmpty(rep)){
+            logger.info("excel中ExpectedResponse未配置！");
+            return  "excel中ExpectedResponse未配置";
+        }
+        if(type.equals(IS_SUCCESS)){
+            //TODO 接口是否有数据
+            int statusCode = rep.extract().response().getStatusCode();
+            return statusCode == 200 ? "": String.valueOf(statusCode);
+        }else if(type.equals(EQUAL_TO)){
+            //TODO  测试 EqualField   字段数据匹配
+            return equalTest(expectedResponse,rep);
+        }else if(type.equals(HAS_ITEMS)){
+            //TODO  测试 HasItemField  字段数据包含
+            return hasItemsTest(expectedResponse,rep);
+        }else if(type.equals(ALL_MATCH)){
+            //TODO  测试 AllMatch      完全匹配
+            return allMatchTest(expectedResponse,rep);
+        }else{
+            return  "Type is not defined!";
+        }
     }
     private String isContains(String actualResult, String[] fields, String ID, String testCase) {
         String msg = "";

@@ -1,4 +1,4 @@
-package com.demo.testng;
+package com.timerchina.testng;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,9 +25,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.demo.testng.utils.DataReader;
-import com.demo.testng.utils.HTTPReqGen;
-import com.demo.testng.utils.RecordHandler;
+import com.timerchina.utils.DataReader;
+import com.timerchina.utils.HTTPReqGen;
+import com.timerchina.utils.RecordHandler;
 import com.jayway.restassured.response.Response;
 
 public class HTTPReqGenTest implements ITest {

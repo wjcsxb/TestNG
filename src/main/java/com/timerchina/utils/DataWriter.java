@@ -1,4 +1,4 @@
-package com.demo.testng.utils;
+package com.timerchina.utils;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;

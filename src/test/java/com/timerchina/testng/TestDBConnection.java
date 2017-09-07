@@ -1,4 +1,4 @@
-package com.demo.testng;
+package com.timerchina.testng;
 
 import org.testng.annotations.Test;
 

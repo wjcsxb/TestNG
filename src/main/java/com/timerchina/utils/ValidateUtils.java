@@ -1,4 +1,4 @@
-package com.demo.testng.utils;
+package com.timerchina.utils;
 
 public class ValidateUtils {
 

@@ -1,4 +1,4 @@
-package com.demo.testng.utils;
+package com.timerchina.utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,6 +1,6 @@
-package com.demo.testng;
+package com.timerchina.testng;
 
-import com.demo.testng.utils.*;
+import com.timerchina.utils.*;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.internal.ValidatableResponseImpl;
 import com.jayway.restassured.matcher.RestAssuredMatchers;

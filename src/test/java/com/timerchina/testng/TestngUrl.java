@@ -1,6 +1,6 @@
-package com.demo.testng;
+package com.timerchina.testng;
 
-import com.demo.testng.utils.JsonUtils;
+import com.timerchina.utils.JsonUtils;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;

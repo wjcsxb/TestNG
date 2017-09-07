@@ -1,4 +1,4 @@
-package com.demo.testng;
+package com.timerchina.testng;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

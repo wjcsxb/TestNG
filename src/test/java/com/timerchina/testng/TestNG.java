@@ -129,13 +129,13 @@ public class TestNG implements ITest {
         HTTPReqGen myReqGen = new HTTPReqGen();
 
         try {
-            myReqGen.generate_request(template, myInputData.get_record(ID));
+            myReqGen.generate_request(template, myInputData.getRecord(ID));
             response = myReqGen.perform_request();
         } catch (Exception e) {
             Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
         }
-        String baseline_message = myBaselineData.get_record(ID).get("ExpectedResponse");
-        String type = myBaselineData.get_record(ID).get("Type");
+        String baseline_message = myBaselineData.getRecord(ID).get("ExpectedResponse");
+        String type = myBaselineData.getRecord(ID).get("Type");
         if(!type.equals(ALL_MATCH)){
             DataWriter.writeData(wb,resultSheet,ID,testCase,"is not AllMatch");
             return;
@@ -159,12 +159,12 @@ public class TestNG implements ITest {
         HTTPReqGen myReqGen = new HTTPReqGen();
 
         try {
-            myReqGen.generate_request(template, myInputData.get_record(ID));
+            myReqGen.generate_request(template, myInputData.getRecord(ID));
             response = myReqGen.perform_request();
         } catch (Exception e) {
             Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
         }
-        String baseline_message = myBaselineData.get_record(ID).get("Response");
+        String baseline_message = myBaselineData.getRecord(ID).get("Response");
         if (response.statusCode() == 200) {
             try {
                 DataWriter.writeData(outputSheet, response.asString(), ID, testCase);
@@ -190,14 +190,14 @@ public class TestNG implements ITest {
         HTTPReqGen myReqGen = new HTTPReqGen();
 
         try {
-            myReqGen.generate_request(template, myInputData.get_record(ID));
+            myReqGen.generate_request(template, myInputData.getRecord(ID));
             response = myReqGen.perform_request();
         } catch (Exception e) {
             Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
         }
 
-        String expectSize = myBaselineData.get_record(ID).get("Size");
-        String compareField = myBaselineData.get_record(ID).get("CompareField");
+        String expectSize = myBaselineData.getRecord(ID).get("Size");
+        String compareField = myBaselineData.getRecord(ID).get("CompareField");
         if (response.statusCode() == 200) {
             DataWriter.writeData(outputSheet, response.asString(), ID, testCase);
             String actualResult = JsonUtils.getJsonValue(response.asString(), "result");
@@ -227,18 +227,18 @@ public class TestNG implements ITest {
      * */
     @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = true)
     public void restAssured(String ID, String testCase) throws JSONException {
-        String expectedResponse = myBaselineData.get_record(ID).get("ExpectedResponse");
-        String type = myBaselineData.get_record(ID).get("Type");
-        String url = myInputData.get_record(ID).get("host") + myInputData.get_record(ID).get("call_suff");
-        String contentType = myInputData.get_record(ID).get("Content-Type");
-        RestAssured.registerParser(contentType,Parser.JSON);
+        String expectedResponse = myBaselineData.getRecord(ID).get("ExpectedResponse");
+        String type = myBaselineData.getRecord(ID).get("Type");
+        String url = myInputData.getRecord(ID).get("host") + myInputData.getRecord(ID).get("call_suff");
+        String contentType = myInputData.getRecord(ID).get("Content-Type");
 
+        RestAssured.registerParser(contentType,Parser.JSON);
         ValidatableResponse rep = getResponse(url);
         DataWriter.writeData(outputSheet,((ValidatableResponseImpl) rep).body().extract().response().asString(),ID,testCase);
 
         String msg = "";
         msg = getTestMsg(type,expectedResponse,rep);
-//        msg = msg + rep.extract().response().getContentType();
+        msg = msg + rep.extract().response().getContentType();
         DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
     }
 

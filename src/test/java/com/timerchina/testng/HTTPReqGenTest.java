@@ -97,13 +97,13 @@ public class HTTPReqGenTest implements ITest {
         HTTPReqGen myReqGen = new HTTPReqGen();
 
         try {
-            myReqGen.generate_request(template, myInputData.get_record(ID));
+            myReqGen.generate_request(template, myInputData.getRecord(ID));
             response = myReqGen.perform_request();
         } catch (Exception e) {
             Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
         }
 
-        String baseline_message = myBaselineData.get_record(ID).get("Response");
+        String baseline_message = myBaselineData.getRecord(ID).get("Response");
         if (response.statusCode() == 200)
             try {
 //                DataWriter.writeData(outputSheet, response.asString(), ID, test_case);

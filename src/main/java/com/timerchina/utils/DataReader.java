@@ -129,7 +129,7 @@ public class DataReader {
      * @param record String key value for record to be returned.
      * @return HashMap of key-value pairs representing the specified record.
      */
-    public RecordHandler get_record(String record) {
+    public RecordHandler getRecord(String record) {
 
         RecordHandler result = new RecordHandler();
 

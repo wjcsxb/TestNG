@@ -101,8 +101,6 @@ public class TestNG implements ITest {
 
         myInputData = new DataReader(inputSheet, true, true, 0);
         Map<String, RecordHandler> myInput = myInputData.get_map();
-        //        System.out.println(myInput.get("1").get_map());
-        // sort map in order so that test cases ran in a fixed order
         List<Map.Entry<String, RecordHandler>> sortMap = Utils.sortMap(myInput);
 
         for (Map.Entry<String,RecordHandler> entry : sortMap) {
@@ -248,7 +246,7 @@ public class TestNG implements ITest {
     }
 
     private static ValidatableResponse getResponse(String url) {
-        return given().contentType(JSON).when().get(url).then().assertThat();
+        return given().when().get(url).then().assertThat();
     }
 
     private String equalTest(String field,ValidatableResponse rep){

@@ -5,6 +5,8 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.xssf.usermodel.*;
 import org.skyscreamer.jsonassert.JSONCompareResult;
 
+import java.util.Date;
+
 public class DataWriter {
     protected static final Logger logger = Logger.getLogger(DataReader.class);
 
@@ -72,7 +74,7 @@ public class DataWriter {
             cell1.setCellValue(ID);
             cell2.setCellValue(testCase);
 
-            if(msg == null || msg.length() == 0){
+            if(ValidateUtils.isEmpty(msg)){
                 cell3.setCellValue("PASSED");
             }else{
                 cell3.setCellValue("FAILED");
@@ -104,6 +106,33 @@ public class DataWriter {
 
             cell5.setCellValue("Expect");
             cell6.setCellValue(expectStr);
+        }
+    }
+    public static void writeDataForTestLog(XSSFSheet resultSheet,int totalCaseNum, int failedCaseNum,String startTime,String endTime){
+        if(ValidateUtils.notEmpty(resultSheet)){
+            int rowNum = resultSheet.getLastRowNum();
+            int colNum = resultSheet.getRow(0).getLastCellNum();
+            XSSFRow row1 = resultSheet.createRow(rowNum+1);
+            XSSFRow row2 = resultSheet.createRow(rowNum+2);
+            XSSFRow row3 = resultSheet.createRow(rowNum+3);
+            XSSFRow row4 = resultSheet.createRow(rowNum+4);
+            XSSFCell cell1 = row1.createCell(1);
+            XSSFCell cell2 = row1.createCell(2);
+            XSSFCell cell3 = row2.createCell(1);
+            XSSFCell cell4 = row2.createCell(2);
+            XSSFCell cell5 = row3.createCell(1);
+            XSSFCell cell6 = row3.createCell(2);
+            XSSFCell cell7 = row4.createCell(1);
+            XSSFCell cell8 = row4.createCell(2);
+
+            cell1.setCellValue("TotalCaseNum");
+            cell2.setCellValue(totalCaseNum);
+            cell3.setCellValue("FailedCaseNum");
+            cell4.setCellValue(failedCaseNum);
+            cell5.setCellValue("Start Time");
+            cell6.setCellValue(startTime);
+            cell7.setCellValue("End Time");
+            cell8.setCellValue(endTime);
         }
     }
 }

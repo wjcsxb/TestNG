@@ -3,13 +3,9 @@ package com.timerchina.testng;
 import com.timerchina.utils.*;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.internal.ValidatableResponseImpl;
-import com.jayway.restassured.matcher.RestAssuredMatchers;
 import com.jayway.restassured.parsing.Parser;
-import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ValidatableResponse;
-import com.sun.xml.internal.bind.v2.TODO;
-import netscape.javascript.JSUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -18,13 +14,11 @@ import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.JSONCompareResult;
-import org.skyscreamer.jsonassert.JSONParser;
 import org.testng.Assert;
 import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
-import static com.jayway.restassured.RestAssured.expect;
 import static org.hamcrest.Matchers.*;
 
 import java.io.*;
@@ -33,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.http.ContentType.JSON;
 
 public class TestNG implements ITest {
 
@@ -43,12 +36,12 @@ public class TestNG implements ITest {
     private DataReader baseLineData;
     private DataReader myBaselineData;
     private String     template;
-    private double totalcase  = 0;
-    private double failedcase = 0;
-    private static final String IS_SUCCESS = "0";
-    private static final String EQUAL_TO = "1";
-    private static final String HAS_ITEMS = "2";
-    private static final String ALL_MATCH = "3";
+    private int              totalCaseNum  = 0;
+    private int              failedCaseNum = 0;
+    private static final String IS_SUCCESS    = "0";
+    private static final String EQUAL_TO      = "1";
+    private static final String HAS_ITEMS     = "2";
+    private static final String ALL_MATCH     = "3";
 
     //    String filePath = "D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx";
 
@@ -97,7 +90,7 @@ public class TestNG implements ITest {
 
     @DataProvider(name = "WorkBookData")
     public Iterator<Object[]> testProvider(ITestContext context) {
-        List<Object[]> test_IDs = new ArrayList<Object[]>();
+        List<Object[]> test_IDs = new ArrayList<>();
 
         myInputData = new DataReader(inputSheet, true, true, 0);
         Map<String, RecordHandler> myInput = myInputData.get_map();
@@ -111,12 +104,12 @@ public class TestNG implements ITest {
             if (!test_ID.equals("") && !test_case.equals("")) {
                 test_IDs.add(new Object[]{test_ID, test_case});
             }
-            totalcase++;
+            totalCaseNum++;
         }
         myBaselineData = new DataReader(baselineSheet, true, true, 0);
 
         //        System.out.println(myBaselineData.get_map().get("1").get_map());
-        //        System.out.println(totalcase);
+        //        System.out.println(totalCaseNum);
         //        System.out.println(Arrays.toString(test_IDs.get(0)));
         //        System.out.println(test_IDs.iterator().next()[1]);
         return test_IDs.iterator();
@@ -143,10 +136,12 @@ public class TestNG implements ITest {
             try {
                 DataWriter.writeData(outputSheet, response.asString(), ID, testCase);
                 JSONCompareResult result = JSONCompare.compareJSON(baseline_message, response.asString(), JSONCompareMode.NON_EXTENSIBLE);
-            } catch (JSONException e) {
+            } catch (Exception e) {
+                failedCaseNum ++;
                 e.printStackTrace();
             }
         } else {
+            failedCaseNum ++;
             msg = "接口请求失败！";
         }
         DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
@@ -240,6 +235,7 @@ public class TestNG implements ITest {
             msg = getTestMsg(type, expectedResponse, rep);
 //            msg = msg + rep.extract().response().getContentType();
         }catch (Exception e){
+            failedCaseNum ++;
             msg = msg + " URL请求失败 " +e.getMessage();
         }
         DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
@@ -264,13 +260,16 @@ public class TestNG implements ITest {
 //                    rep.assertThat().body(strings[0], equalTo(Arrays.asList(strings[1])));
                     Assert.assertEquals((ArrayList)actualObject,Arrays.asList(strings[1]));
                 }else{
+                    failedCaseNum++;
                     msg = "actualObject is not Integer ,String or ArrayList";
                     break;
                 }
             }catch(AssertionError e){
+                failedCaseNum ++;
                 msg = e.toString();
                 break;
             }catch (Exception e1){
+                failedCaseNum ++;
                 msg = e1.toString();
                 break;
             }
@@ -296,13 +295,16 @@ public class TestNG implements ITest {
                         }
                     }
                 }else {
+                    failedCaseNum++;
                     msg = "Expected " + strings[0] + " is null or not ArrayList.";
                     break;
                 }
             }catch (AssertionError e){
+                failedCaseNum++;
                 msg = e.toString();
                 break;
             }catch (Exception e1){
+                failedCaseNum ++;
                 msg = e1.toString();
                 break;
             }
@@ -315,24 +317,35 @@ public class TestNG implements ITest {
         try{
             rep.body(equalTo(expectStr));
         }catch (AssertionError e){
+            failedCaseNum++;
             msg = e.toString();
         }
         return msg;
     }
 
+    private String successTest(ValidatableResponse rep){
+        int statusCode = rep.extract().response().getStatusCode();
+        if(statusCode == 200){
+            return null;
+        }else{
+            failedCaseNum++;
+            return String.valueOf(statusCode);
+        }
+    }
     private String getTestMsg(String type ,String expectedResponse ,ValidatableResponse rep ){
         if(ValidateUtils.isEmpty(type)){
+            failedCaseNum ++;
             logger.info("excel中Type未配置！");
             return  "excel中Type未配置";
         }
         if(ValidateUtils.isEmpty(rep)){
+            failedCaseNum ++;
             logger.info("excel中ExpectedResponse未配置！");
             return  "excel中ExpectedResponse未配置";
         }
         if(type.equals(IS_SUCCESS)){
             //TODO 接口是否有数据
-            int statusCode = rep.extract().response().getStatusCode();
-            return statusCode == 200 ? "": String.valueOf(statusCode);
+            return successTest(rep);
         }else if(type.equals(EQUAL_TO)){
             //TODO  测试 EqualField   字段数据匹配
             return equalTest(expectedResponse,rep);
@@ -343,6 +356,7 @@ public class TestNG implements ITest {
             //TODO  测试 AllMatch      完全匹配
             return allMatchTest(expectedResponse,rep);
         }else{
+            failedCaseNum ++;
             return  "Type is not defined!";
         }
     }
@@ -362,8 +376,10 @@ public class TestNG implements ITest {
     @AfterTest
     @Parameters("filePath")
     public void afterTest(String filePath) {
-        //        SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        //        endTime = sf.format(new Date());
+        SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        endTime = sf.format(new Date());
+        DataWriter.writeDataForTestLog(resultSheet, totalCaseNum, failedCaseNum, startTime, endTime);
+        //统计时间
         FileOutputStream fileOutputStream = null;
         try {
             fileOutputStream = new FileOutputStream(filePath);

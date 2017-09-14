@@ -19,7 +19,8 @@ public class TestNG extends BaseTest {
     private Logger logger = Logger.getLogger(TestNG.class);
 
 
-    @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = true,threadPoolSize = 3,invocationCount = 22, timeOut = 1000)
+    @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = true)
+//    threadPoolSize = 3,invocationCount = 10, timeOut = 10000 同一个测试方法的并发
     public void restAssured(String ID, String testCase) {
 
         Long id = Thread.currentThread().getId();

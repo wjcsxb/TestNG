@@ -117,7 +117,7 @@ public class DataReader {
      *
      * @return HashMap<String, RecordHandler>, map of ID-Record data.
      */
-    public HashMap<String, RecordHandler> get_map() {
+    public HashMap<String, RecordHandler> getMap() {
 
         return map;
     }

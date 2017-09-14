@@ -27,7 +27,7 @@ public class BaseTest implements ITest {
     Response   response;
     DataReader myInputData;
     DataReader baseLineData;
-    protected DataReader myBaselineData;
+    DataReader myBaselineData;
     String     template;
     private int              totalCaseNum  = 0;
     int              failedCaseNum = 0;
@@ -83,24 +83,24 @@ public class BaseTest implements ITest {
 
     @DataProvider(name = "WorkBookData")
     public Iterator<Object[]> testProvider(ITestContext context) {
-        List<Object[]> test_IDs = new ArrayList<>();
+        List<Object[]> testIDs = new ArrayList<>();
 
         myInputData = new DataReader(inputSheet, true, true, 0);
-        Map<String, RecordHandler> myInput = myInputData.get_map();
+        Map<String, RecordHandler> myInput = myInputData.getMap();
         List<Map.Entry<String, RecordHandler>> sortMap = Utils.sortMap(myInput);
 
         for (Map.Entry<String,RecordHandler> entry : sortMap) {
-            String test_ID = entry.getKey();
+            String testID = entry.getKey();
             //            System.out.println(test_ID);
-            String test_case = entry.getValue().get("TestCase");
+            String testCase = entry.getValue().get("TestCase");
             //            System.out.println(test_case);
-            if (!test_ID.equals("") && !test_case.equals("")) {
-                test_IDs.add(new Object[]{test_ID, test_case});
+            if (!testID.equals("") && !testCase.equals("")) {
+                testIDs.add(new Object[]{testID, testCase});
             }
             totalCaseNum++;
         }
         myBaselineData = new DataReader(baselineSheet, true, true, 0);
-        return test_IDs.iterator();
+        return testIDs.iterator();
     }
 
     @AfterTest

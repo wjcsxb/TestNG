@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="TestAPI" parallel="false" >
+<suite name="TestB" parallel="false">
     <parameter name="filePath" value="D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx"/>
-    <test name="Test 1">
+    <test name="Test B">
         <classes>
-            <class name="com.timerchina.testng.TestNG"/>
+            <class name="com.timerchina.testng.TestByJSONCompare"/>
         </classes>
     </test>
 

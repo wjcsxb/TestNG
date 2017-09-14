@@ -28,198 +28,94 @@ import java.util.*;
 
 import static com.jayway.restassured.RestAssured.given;
 
-public class TestNG implements ITest {
+public class TestNG extends BaseTest {
 
     private Logger logger = Logger.getLogger(TestNG.class);
-    private Response   response;
-    private DataReader myInputData;
-    private DataReader baseLineData;
-    private DataReader myBaselineData;
-    private String     template;
-    private int              totalCaseNum  = 0;
-    private int              failedCaseNum = 0;
-    private static final String IS_SUCCESS    = "0";
-    private static final String EQUAL_TO      = "1";
-    private static final String HAS_ITEMS     = "2";
-    private static final String ALL_MATCH     = "3";
+//    private Response   response;
+//    private DataReader myInputData;
+//    private DataReader baseLineData;
+//    private DataReader myBaselineData;
+//    private String     template;
+//    private int              totalCaseNum  = 0;
+//    private int              failedCaseNum = 0;
+//    private static final String IS_SUCCESS    = "0";
+//    private static final String EQUAL_TO      = "1";
+//    private static final String HAS_ITEMS     = "2";
+//    private static final String ALL_MATCH     = "3";
+//
+//    //    String filePath = "D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx";
+//
+//    XSSFWorkbook wb              = null;
+//    XSSFSheet    inputSheet      = null;
+//    XSSFSheet    baselineSheet   = null;
+//    XSSFSheet    outputSheet     = null;
+//    XSSFSheet    comparsionSheet = null;
+//    XSSFSheet    resultSheet     = null;
+//
+//    private String startTime = "";
+//    private String endTime   = "";
+//
+//    public String getTestName() {
+//        return "API Test";
+//    }
+//
+//    @BeforeTest
+//    @Parameters("filePath")
+//    public void setup(String filePath) {
+//        try {
+//            wb = new XSSFWorkbook(new FileInputStream(filePath));
+//        } catch (Exception e) {
+//            logger.info(filePath + "路径错误或者excel文件损坏！");
+//        }
+//
+//        inputSheet = wb.getSheet("Input");
+//        baselineSheet = wb.getSheet("Baseline");
+//        outputSheet = wb.getSheet("Output");
+//        comparsionSheet = wb.getSheet("Comparison");
+//        resultSheet = wb.getSheet("Result");
+//        SheetUtils.clearSheet(wb, "Output");
+//        SheetUtils.clearSheet(wb, "Comparison");
+//        SheetUtils.clearSheet(wb, "Result");
+//
+//
+//        try {
+//            InputStream is = HTTPReqGenTest.class.getClassLoader().getResourceAsStream("http_request_template.txt");
+//            template = IOUtils.toString(is, Charset.defaultCharset());
+//        } catch (Exception e) {
+//            Assert.fail("Problem fetching data from input file:" + e.getMessage());
+//        }
+//        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        startTime = sf.format(new Date());
+//    }
 
-    //    String filePath = "D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx";
+//    @DataProvider(name = "WorkBookData")
+//    public Iterator<Object[]> testProvider(ITestContext context) {
+//        List<Object[]> test_IDs = new ArrayList<>();
+//
+//        myInputData = new DataReader(inputSheet, true, true, 0);
+//        Map<String, RecordHandler> myInput = myInputData.get_map();
+//        List<Map.Entry<String, RecordHandler>> sortMap = Utils.sortMap(myInput);
+//
+//        for (Map.Entry<String,RecordHandler> entry : sortMap) {
+//            String test_ID = entry.getKey();
+//            //            System.out.println(test_ID);
+//            String test_case = entry.getValue().get("TestCase");
+//            //            System.out.println(test_case);
+//            if (!test_ID.equals("") && !test_case.equals("")) {
+//                test_IDs.add(new Object[]{test_ID, test_case});
+//            }
+//            totalCaseNum++;
+//        }
+//        myBaselineData = new DataReader(baselineSheet, true, true, 0);
+//        return test_IDs.iterator();
+//    }
 
-    XSSFWorkbook wb              = null;
-    XSSFSheet    inputSheet      = null;
-    XSSFSheet    baselineSheet   = null;
-    XSSFSheet    outputSheet     = null;
-    XSSFSheet    comparsionSheet = null;
-    XSSFSheet    resultSheet     = null;
-
-    private String startTime = "";
-    private String endTime   = "";
-
-    public String getTestName() {
-        return "API Test";
-    }
-
-    @BeforeTest
-    @Parameters("filePath")
-    public void setup(String filePath) {
-        try {
-            wb = new XSSFWorkbook(new FileInputStream(filePath));
-        } catch (Exception e) {
-            logger.info(filePath + "路径错误或者excel文件损坏！");
-        }
-
-        inputSheet = wb.getSheet("Input");
-        baselineSheet = wb.getSheet("Baseline");
-        outputSheet = wb.getSheet("Output");
-        comparsionSheet = wb.getSheet("Comparison");
-        resultSheet = wb.getSheet("Result");
-        SheetUtils.clearSheet(wb, "Output");
-        SheetUtils.clearSheet(wb, "Comparison");
-        SheetUtils.clearSheet(wb, "Result");
-
-
-        try {
-            InputStream is = HTTPReqGenTest.class.getClassLoader().getResourceAsStream("http_request_template.txt");
-            template = IOUtils.toString(is, Charset.defaultCharset());
-        } catch (Exception e) {
-            Assert.fail("Problem fetching data from input file:" + e.getMessage());
-        }
-        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        startTime = sf.format(new Date());
-    }
-
-    @DataProvider(name = "WorkBookData")
-    public Iterator<Object[]> testProvider(ITestContext context) {
-        List<Object[]> test_IDs = new ArrayList<>();
-
-        myInputData = new DataReader(inputSheet, true, true, 0);
-        Map<String, RecordHandler> myInput = myInputData.get_map();
-        List<Map.Entry<String, RecordHandler>> sortMap = Utils.sortMap(myInput);
-
-        for (Map.Entry<String,RecordHandler> entry : sortMap) {
-            String test_ID = entry.getKey();
-            //            System.out.println(test_ID);
-            String test_case = entry.getValue().get("TestCase");
-            //            System.out.println(test_case);
-            if (!test_ID.equals("") && !test_case.equals("")) {
-                test_IDs.add(new Object[]{test_ID, test_case});
-            }
-            totalCaseNum++;
-        }
-        myBaselineData = new DataReader(baselineSheet, true, true, 0);
-
-        //        System.out.println(myBaselineData.get_map().get("1").get_map());
-        //        System.out.println(totalCaseNum);
-        //        System.out.println(Arrays.toString(test_IDs.get(0)));
-        //        System.out.println(test_IDs.iterator().next()[1]);
-        return test_IDs.iterator();
-    }
-
-    @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = false)
-    public void apiRunTest(String ID, String testCase) {
-        HTTPReqGen myReqGen = new HTTPReqGen();
-
-        try {
-            myReqGen.generate_request(template, myInputData.getRecord(ID));
-            response = myReqGen.perform_request();
-        } catch (Exception e) {
-            Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
-        }
-        String baseline_message = myBaselineData.getRecord(ID).get("ExpectedResponse");
-        String type = myBaselineData.getRecord(ID).get("Type");
-        if(!type.equals(ALL_MATCH)){
-            DataWriter.writeData(wb,resultSheet,ID,testCase,"is not AllMatch");
-            return;
-        }
-        String msg = "";
-        if (response.statusCode() == 200) {
-            try {
-                DataWriter.writeData(outputSheet, response.asString(), ID, testCase);
-                JSONCompareResult result = JSONCompare.compareJSON(baseline_message, response.asString(), JSONCompareMode.NON_EXTENSIBLE);
-            } catch (Exception e) {
-                failedCaseNum ++;
-                e.printStackTrace();
-            }
-        } else {
-            failedCaseNum ++;
-            msg = "接口请求失败！";
-        }
-        DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
-    }
-
-    @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = false)
-    public void testAPi(String ID, String testCase) {
-        HTTPReqGen myReqGen = new HTTPReqGen();
-
-        try {
-            myReqGen.generate_request(template, myInputData.getRecord(ID));
-            response = myReqGen.perform_request();
-        } catch (Exception e) {
-            Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
-        }
-        String baseline_message = myBaselineData.getRecord(ID).get("Response");
-        if (response.statusCode() == 200) {
-            try {
-                DataWriter.writeData(outputSheet, response.asString(), ID, testCase);
-                JSONCompareResult result = JSONCompare.compareJSON(baseline_message, response.asString(), JSONCompareMode.NON_EXTENSIBLE);
-
-                if (!result.passed()) {
-                    DataWriter.writeData(wb, resultSheet, false, result, ID, testCase);
-                    DataWriter.writeData(comparsionSheet, baseline_message, response.asString(), ID, testCase);
-                } else {
-                    DataWriter.writeData(wb, resultSheet, true, result, ID, testCase);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        } else {
-            DataWriter.writeData(outputSheet, response.statusLine(), ID, testCase);
-            DataWriter.writeData(wb, resultSheet, ID, testCase, "接口请求失败！");
-        }
-    }
-
-    @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = false)
-    public void testField(String ID, String testCase) {
-        HTTPReqGen myReqGen = new HTTPReqGen();
-
-        try {
-            myReqGen.generate_request(template, myInputData.getRecord(ID));
-            response = myReqGen.perform_request();
-        } catch (Exception e) {
-            Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
-        }
-
-        String expectSize = myBaselineData.getRecord(ID).get("Size");
-        String compareField = myBaselineData.getRecord(ID).get("CompareField");
-        if (response.statusCode() == 200) {
-            DataWriter.writeData(outputSheet, response.asString(), ID, testCase);
-            String actualResult = JsonUtils.getJsonValue(response.asString(), "result");
-            if (actualResult == null || actualResult.length() == 0) {
-                actualResult = JsonUtils.getJsonValue(response.asString(), "list");
-            }
-            String actualSize = JsonUtils.getJsonValue(response.asString(), "size");
-            if (compareField != null && compareField.length() > 0) {
-                String[] fields = compareField.split(",");
-                String msg = isContains(actualResult, fields, ID, testCase);
-                if (!expectSize.equals(actualSize)) {
-                    msg = msg + " and size is Unexpect!";
-                }
-                DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
-            } else {
-                DataWriter.writeData(wb, resultSheet, ID, testCase, "CompareField未配置！");
-            }
-
-        } else {
-            DataWriter.writeData(outputSheet, response.statusLine(), ID, testCase);
-            DataWriter.writeData(wb, resultSheet, ID, testCase, "接口请求失败！");
-        }
-    }
-
-    /**
-     * RestAssured + TestNG 测试
-     * */
-    @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = true)
+    @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = true,threadPoolSize = 3,invocationCount = 22, timeOut = 1000)
     public void restAssured(String ID, String testCase) {
+
+        Long id = Thread.currentThread().getId();
+        System.out.println("Test method executing on thread with id: " + id);
+
         String expectedResponse = myBaselineData.getRecord(ID).get("ExpectedResponse");
         String type = myBaselineData.getRecord(ID).get("Type");
         String url = myInputData.getRecord(ID).get("host") + myInputData.getRecord(ID).get("call_suff");
@@ -282,10 +178,10 @@ public class TestNG implements ITest {
         for( String s : fields ){
             String[] strings = s.split("=");
             try{
-                Object actualOject = rep.extract().response().path(strings[0]);
-                if(actualOject != null && actualOject instanceof ArrayList){
+                Object actualObject = rep.extract().response().path(strings[0]);
+                if(actualObject != null && actualObject instanceof ArrayList){
                     String[] results =  strings[1].split(",");
-                    if(((ArrayList) actualOject).get(0) instanceof Integer){
+                    if(((ArrayList) actualObject).get(0) instanceof Integer){
                         for(String s1:results){
                             rep.body(strings[0],hasItems(Integer.valueOf(s1)));
                         }
@@ -344,50 +240,40 @@ public class TestNG implements ITest {
             return  "excel中ExpectedResponse未配置";
         }
         if(type.equals(IS_SUCCESS)){
-            //TODO 接口是否有数据
-            return successTest(rep);
+            return successTest(rep);        //  测试 接口是否有数据
         }else if(type.equals(EQUAL_TO)){
-            //TODO  测试 EqualField   字段数据匹配
-            return equalTest(expectedResponse,rep);
+            return equalTest(expectedResponse,rep);   //  测试 EqualField   字段数据匹配
         }else if(type.equals(HAS_ITEMS)){
-            //TODO  测试 HasItemField  字段数据包含
-            return hasItemsTest(expectedResponse,rep);
+            return hasItemsTest(expectedResponse,rep);  // 测试 HasItemField  字段数据包含
         }else if(type.equals(ALL_MATCH)){
-            //TODO  测试 AllMatch      完全匹配
-            return allMatchTest(expectedResponse,rep);
+            return allMatchTest(expectedResponse,rep);    // 测试 AllMatch      完全匹配
         }else{
             failedCaseNum ++;
             return  "Type is not defined!";
         }
     }
-    private String isContains(String actualResult, String[] fields, String ID, String testCase) {
-        String msg = "";
-        for (String s : fields) {
-            if (!actualResult.contains(s)) {
-                String[] values = s.split(":");
-                msg = values[0] + "is Unexpected";
-                return msg;
-            }
-        }
-        return null;
-    }
 
 
-    @AfterTest
-    @Parameters("filePath")
-    public void afterTest(String filePath) {
-        SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        endTime = sf.format(new Date());
-        DataWriter.writeDataForTestLog(resultSheet, totalCaseNum, failedCaseNum, startTime, endTime);
-        //统计时间
-        FileOutputStream fileOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream(filePath);
-            wb.write(fileOutputStream);
-            fileOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @BeforeMethod
+    public void beforeMethod() {
+        long id = Thread.currentThread().getId();
+        System.out.println("Before test-method. Thread id is: " + id);
     }
+//    @AfterTest
+//    @Parameters("filePath")
+//    public void afterTest(String filePath) {
+//        SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        endTime = sf.format(new Date());
+//        DataWriter.writeDataForTestLog(resultSheet, totalCaseNum, failedCaseNum, startTime, endTime);
+//        //统计时间
+//        FileOutputStream fileOutputStream = null;
+//        try {
+//            fileOutputStream = new FileOutputStream(filePath);
+//            wb.write(fileOutputStream);
+//            fileOutputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }

@@ -23,8 +23,8 @@ public class TestByJSONCompare extends BaseTest{
         HTTPReqGen myReqGen = new HTTPReqGen();
 
         try {
-            myReqGen.generate_request(template, myInputData.getRecord(ID));
-            response = myReqGen.perform_request();
+            myReqGen.generateRequest(template, myInputData.getRecord(ID));
+            response = myReqGen.performRequest();
         } catch (Exception e) {
             Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
         }
@@ -55,8 +55,8 @@ public class TestByJSONCompare extends BaseTest{
         HTTPReqGen myReqGen = new HTTPReqGen();
 
         try {
-            myReqGen.generate_request(template, myInputData.getRecord(ID));
-            response = myReqGen.perform_request();
+            myReqGen.generateRequest(template, myInputData.getRecord(ID));
+            response = myReqGen.performRequest();
         } catch (Exception e) {
             Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
         }

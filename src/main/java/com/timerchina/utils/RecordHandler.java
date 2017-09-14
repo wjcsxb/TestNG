@@ -10,9 +10,9 @@ public class RecordHandler {
         VALUE, NAMED_MAP, INDEXED_LIST
     }
 
-    private String single_value = "";
-    private HashMap<String, String> named_value_map = new HashMap<String, String>();
-    private List<String> indexed_value_list = new ArrayList<String>();
+    private String singleValue = "";
+    private HashMap<String, String> namedValueMap = new HashMap<>();
+    private List<String> indexedValueList = new ArrayList<>();
     private RecordType myType;
 
     public RecordHandler() {
@@ -22,26 +22,26 @@ public class RecordHandler {
     public RecordHandler(String value) {
 
         this.myType = RecordType.VALUE;
-        this.single_value = value;
+        this.singleValue = value;
 
     }
 
     public RecordHandler(HashMap<String, String> map) {
 
         this.myType = RecordType.NAMED_MAP;
-        this.named_value_map = map;
+        this.namedValueMap = map;
 
     }
 
     public RecordHandler(List<String> list) {
 
         this.myType = RecordType.INDEXED_LIST;
-        this.indexed_value_list = list;
+        this.indexedValueList = list;
 
     }
 
-    public HashMap<String, String> get_map() {
-        return named_value_map;
+    public HashMap<String, String> getMap() {
+        return namedValueMap;
     }
 
     public int size() {
@@ -50,9 +50,9 @@ public class RecordHandler {
         if(myType.equals(RecordType.VALUE)) {
             result = 1;
         } else if(myType.equals(RecordType.NAMED_MAP)) {
-            result = named_value_map.size();
+            result = namedValueMap.size();
         } else if(myType.equals(RecordType.INDEXED_LIST)) {
-            result = indexed_value_list.size();
+            result = indexedValueList.size();
         }
 
         return result;
@@ -61,7 +61,7 @@ public class RecordHandler {
     public String get() {
         String result = "";
 
-        if(myType.equals(RecordType.VALUE)) result = single_value;
+        if(myType.equals(RecordType.VALUE)) result = singleValue;
         else {
             System.out.println("Called get() on wrong type:" + myType.toString());
         }
@@ -72,7 +72,7 @@ public class RecordHandler {
     public String get(String key) {
         String result = "";
 
-        if(myType.equals(RecordType.NAMED_MAP)) result = named_value_map.get(key);
+        if(myType.equals(RecordType.NAMED_MAP)) result = namedValueMap.get(key);
 
         return result;
     }
@@ -80,7 +80,7 @@ public class RecordHandler {
     public String get(Integer index) {
         String result = "";
 
-        if(myType.equals(RecordType.INDEXED_LIST)) result = indexed_value_list.get(index);
+        if(myType.equals(RecordType.INDEXED_LIST)) result = indexedValueList.get(index);
 
         return result;
     }
@@ -89,10 +89,10 @@ public class RecordHandler {
         Boolean result = false;
 
         if(myType.equals(RecordType.VALUE)) {
-            this.single_value = value;
+            this.singleValue = value;
             result = true;
         } else if(myType.equals(RecordType.INDEXED_LIST)) {
-            this.indexed_value_list.add(value);
+            this.indexedValueList.add(value);
             result = true;
         }
 
@@ -103,7 +103,7 @@ public class RecordHandler {
         Boolean result = false;
 
         if(myType.equals(RecordType.NAMED_MAP)) {
-            this.named_value_map.put(key, value);
+            this.namedValueMap.put(key, value);
             result = true;
         }
 
@@ -114,7 +114,7 @@ public class RecordHandler {
         Boolean result = false;
 
         if(myType.equals(RecordType.INDEXED_LIST)) {
-            if(this.indexed_value_list.size() > index) this.indexed_value_list.set(index, value);
+            if(this.indexedValueList.size() > index) this.indexedValueList.set(index, value);
 
             result = true;
         }
@@ -125,11 +125,11 @@ public class RecordHandler {
     public Boolean has(String value) {
         Boolean result = false;
 
-        if(myType.equals(RecordType.VALUE) && this.single_value.equals(value)) {
+        if(myType.equals(RecordType.VALUE) && this.singleValue.equals(value)) {
             result = true;
-        } else if(myType.equals(RecordType.NAMED_MAP) && this.named_value_map.containsKey(value)) {
+        } else if(myType.equals(RecordType.NAMED_MAP) && this.namedValueMap.containsKey(value)) {
             result = true;
-        } else if(myType.equals(RecordType.INDEXED_LIST) && this.indexed_value_list.contains(value)) {
+        } else if(myType.equals(RecordType.INDEXED_LIST) && this.indexedValueList.contains(value)) {
             result = true;
         }
 
@@ -139,15 +139,15 @@ public class RecordHandler {
     public Boolean remove(String value) {
         Boolean result = false;
 
-        if(myType.equals(RecordType.VALUE) && this.single_value.equals(value)) {
-            this.single_value = "";
+        if(myType.equals(RecordType.VALUE) && this.singleValue.equals(value)) {
+            this.singleValue = "";
             result = true;
         }
-        if(myType.equals(RecordType.NAMED_MAP) && this.named_value_map.containsKey(value)) {
-            this.named_value_map.remove(value);
+        if(myType.equals(RecordType.NAMED_MAP) && this.namedValueMap.containsKey(value)) {
+            this.namedValueMap.remove(value);
             result = true;
-        } else if(myType.equals(RecordType.INDEXED_LIST) && this.indexed_value_list.contains(value)) {
-            this.indexed_value_list.remove(value);
+        } else if(myType.equals(RecordType.INDEXED_LIST) && this.indexedValueList.contains(value)) {
+            this.indexedValueList.remove(value);
             result = true;
         }
 
@@ -157,8 +157,8 @@ public class RecordHandler {
     public Boolean remove(Integer index) {
         Boolean result = false;
 
-        if(myType.equals(RecordType.INDEXED_LIST) && this.indexed_value_list.contains(index)) {
-            this.indexed_value_list.remove(index);
+        if(myType.equals(RecordType.INDEXED_LIST) && this.indexedValueList.contains(index)) {
+            this.indexedValueList.remove(index);
             result = true;
         }
 

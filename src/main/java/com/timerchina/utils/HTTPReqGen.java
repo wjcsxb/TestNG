@@ -24,20 +24,20 @@ public class HTTPReqGen {
 
     private RequestSpecification reqSpec;
 
-    private String call_host = "";
-    private String call_suffix = "";
-    private String call_string = "";
-    private String call_type = "";
+    private String callHost = "";
+    private String callSuffix = "";
+    private String callString = "";
+    private String callType = "";
     private String body = "";
     private Map<String, String> headers = new HashMap<String, String>();
-    private HashMap<String, String> cookie_list = new HashMap<String, String>();
+    private HashMap<String, String> cookieList = new HashMap<String, String>();
 
     public Map<String, String> getHeaders() {
         return headers;
     }
 
     public String getCallString() {
-        return call_string;
+        return callString;
     }
 
     /**
@@ -53,16 +53,16 @@ public class HTTPReqGen {
     }
 
     /**
-     * Pulls HashMap from given RecordHandler and calls primary generate_request method with it.
+     * Pulls HashMap from given RecordHandler and calls primary generateRequest method with it.
      *
      * @param template String, should contain the full template.
      * @param record RecordHandler, the input data used to fill in replacement tags that exist in the template.
      * @return this Reference to this class, primarily to allow request generation and performance in one line.
      * @throws Exception
      */
-    public HTTPReqGen generate_request(String template, RecordHandler record) throws Exception {
+    public HTTPReqGen generateRequest(String template, RecordHandler record) throws Exception {
 
-        return generate_request(template, (HashMap<String, String>) record.get_map());
+        return generateRequest(template, (HashMap<String, String>) record.getMap());
     }
 
     /**
@@ -73,7 +73,7 @@ public class HTTPReqGen {
      * After filling in the template, parses the resulting string in preparation for performing the HTTP request. Expects the
      * the string to be in the following format:
      *
-     * <<call_type>> <<call_suffix>>
+     * <<callType>> <<callSuffix>>
      * Host: <<root_host_name>>
      * <<header1_name>>:<<header1_value>>
      * ...
@@ -81,7 +81,7 @@ public class HTTPReqGen {
      *
      * <<body_text>>
      *
-     * <<call_type>> must be GET, PUT, POST, or DELETE. <<call_suffix>> must be a string with no spaces. It is appended to
+     * <<callType>> must be GET, PUT, POST, or DELETE. <<callSuffix>> must be a string with no spaces. It is appended to
      * <<root_host_name>> to form the complete call string. After a single blank line is encountered, the rest of the file
      * is used as the body of text for PUT and POST calls. This function also expects the Record Handler to include a field
      * named "VPID" containing a unique record identifier for debugging purposes.
@@ -91,30 +91,30 @@ public class HTTPReqGen {
      * @return this Reference to this class, primarily to allow request generation and performance in one line.
      * @throws Exception
      */
-    public HTTPReqGen generate_request(String template, HashMap<String, String> record) throws Exception {
+    public HTTPReqGen generateRequest(String template, HashMap<String, String> record) throws Exception {
 
-        String filled_template = "";
-        Boolean found_replacement = true;
+        String filledTemplate = "";
+        Boolean foundReplacement = true;
         headers.clear();
 
         try {
 
             // Splits template into tokens, separating out the replacement strings
             // like <<id>>
-            String[] tokens = tokenize_template(template);
+            String[] tokens = tokenizeTemplate(template);
 
             // Repeatedly perform replacements with data from record until no
             // replacements are found
             // If a replacement's result is an empty string, it will not throw an
             // error (but will throw one if there is no column for that result)
-            while(found_replacement) {
-                found_replacement = false;
-                filled_template = "";
+            while(foundReplacement) {
+                foundReplacement = false;
+                filledTemplate = "";
 
                 for(String item: tokens) {
 
                     if(item.startsWith("<<") && item.endsWith(">>")) {
-                        found_replacement = true;
+                        foundReplacement = true;
                         item = item.substring(2, item.length() - 2);
 
                         if( !record.containsKey(item)) {
@@ -124,10 +124,10 @@ public class HTTPReqGen {
                         item = record.get(item);
                     }
 
-                    filled_template += item;
+                    filledTemplate += item;
                 }
 
-                tokens = tokenize_template(filled_template);
+                tokens = tokenizeTemplate(filledTemplate);
             }
 
         } catch (Exception e) {
@@ -138,27 +138,27 @@ public class HTTPReqGen {
 
             // Feed filled template into BufferedReader so that we can read it line
             // by line.
-            InputStream stream = IOUtils.toInputStream(filled_template, "UTF-8");
+            InputStream stream = IOUtils.toInputStream(filledTemplate, "UTF-8");
             BufferedReader in = new BufferedReader(new InputStreamReader(stream));
             String line = "";
-            String[] line_tokens;
+            String[] lineTokens;
 
             // First line should always be call type followed by call suffix
             line = in.readLine();
-            line_tokens = line.split(" ");
-            call_type = line_tokens[0];
-            call_suffix = line_tokens[1];
+            lineTokens = line.split(" ");
+            callType = lineTokens[0];
+            callSuffix = lineTokens[1];
 
             // Second line should contain the host as it's second token
 //            line = in.readLine();
 //            line_tokens = line.split(" ");
-//            call_host = line_tokens[1];
-            call_host = line_tokens[3];
+//            callHost = line_tokens[1];
+            callHost = lineTokens[3];
 
             // Full call string for RestAssured will be concatenation of call
             // host and call suffix
-            call_string = call_host + call_suffix;
-            call_string = call_string.substring(5,call_string.length());
+            callString = callHost + callSuffix;
+            callString = callString.substring(5, callString.length());
             // Remaining lines will contain headers, until the read line is
             // empty
             line = in.readLine();
@@ -193,7 +193,7 @@ public class HTTPReqGen {
      *
      * @return response Response, will contain entire response (response string and status code).
      */
-    public Response perform_request() throws Exception {
+    public Response performRequest() throws Exception {
 
         Response response = null;
 
@@ -203,32 +203,32 @@ public class HTTPReqGen {
                 reqSpec.header(entry.getKey(), entry.getValue());
             }
 
-            for(Map.Entry<String, String> entry: cookie_list.entrySet()) {
+            for(Map.Entry<String, String> entry: cookieList.entrySet()) {
                 reqSpec.cookie(entry.getKey(), entry.getValue());
             }
 //            reqSpec.contentType("application/json");
 
-            switch(call_type) {
+            switch(callType) {
 
                 case "GET": {
-                    response = reqSpec.get(call_string);
+                    response = reqSpec.get(callString);
                     break;
                 }
                 case "POST": {
-                    response = reqSpec.body(body).post(call_string);
+                    response = reqSpec.body(body).post(callString);
                     break;
                 }
                 case "PUT": {
-                    response = reqSpec.body(body).put(call_string);
+                    response = reqSpec.body(body).put(callString);
                     break;
                 }
                 case "DELETE": {
-                    response = reqSpec.delete(call_string);
+                    response = reqSpec.delete(callString);
                     break;
                 }
 
                 default: {
-                    logger.error("Unknown call type: [" + call_type + "]");
+                    logger.error("Unknown call type: [" + callType + "]");
                 }
             }
 
@@ -245,7 +245,7 @@ public class HTTPReqGen {
      * @param template String, the template to be tokenized.
      * @return list String[], contains the tokens from the template.
      */
-    private String[] tokenize_template(String template) {
+    private String[] tokenizeTemplate(String template) {
         return template.split("(?=[<]{2})|(?<=[>]{2})");
     }
 

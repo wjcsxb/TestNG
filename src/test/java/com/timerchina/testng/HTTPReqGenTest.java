@@ -18,16 +18,13 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.JSONCompareResult;
 import org.testng.Assert;
 import org.testng.ITest;
-import org.testng.ITestContext;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.timerchina.utils.DataReader;
 import com.timerchina.utils.HTTPReqGen;
-import com.timerchina.utils.RecordHandler;
 import com.jayway.restassured.response.Response;
 
 public class HTTPReqGenTest implements ITest {
@@ -97,8 +94,8 @@ public class HTTPReqGenTest implements ITest {
         HTTPReqGen myReqGen = new HTTPReqGen();
 
         try {
-            myReqGen.generate_request(template, myInputData.getRecord(ID));
-            response = myReqGen.perform_request();
+            myReqGen.generateRequest(template, myInputData.getRecord(ID));
+            response = myReqGen.performRequest();
         } catch (Exception e) {
             Assert.fail("Problem using HTTPRequestGenerator to generate response: " + e.getMessage());
         }

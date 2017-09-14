@@ -19,13 +19,4 @@ public class Utils {
         return list;
     }
 
-    public static void main(String[] args){
-        Map<String,String> map = new HashMap<>();
-        map.put("2","er");
-        map.put("3","san");
-        map.put("1","yi");
-        map.put("4","si");
-//        sortMap(map);
-        System.out.println(map.entrySet().toString());
-    }
 }

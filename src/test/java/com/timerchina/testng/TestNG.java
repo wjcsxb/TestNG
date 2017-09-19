@@ -21,10 +21,7 @@ public class TestNG extends BaseTest {
 
     @Test(dataProvider = "WorkBookData", description = "ReqGenTest", enabled = true)
 //    threadPoolSize = 3,invocationCount = 10, timeOut = 10000 同一个测试方法的并发
-    public void restAssured(String ID, String testCase) {
-
-        Long id = Thread.currentThread().getId();
-        System.out.println("Test method executing on thread with id: " + id);
+    public void test(String ID, String testCase) {
 
         String expectedResponse = myBaselineData.getRecord(ID).get("ExpectedResponse");
         String type = myBaselineData.getRecord(ID).get("Type");

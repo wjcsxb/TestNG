@@ -3,7 +3,7 @@
 
 <suite name="TestAPI" parallel="false" >
     <!--<suite name="TestAPI" parallel="methods" thread-count="5" data-provider-thread-count="10" >-->
-    <parameter name="filePath" value="D:\\Jfinal\\TestNG\\src\\test\\resources\\api-test.xlsx"/>
+    <parameter name="filePath" value="D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx"/>
     <test name="Test 1">
         <classes>
             <class name="com.timerchina.testng.TestNG"/>

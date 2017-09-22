@@ -81,7 +81,7 @@ public class BaseTest implements ITest {
         startTime = sf.format(new Date());
     }
 
-    @DataProvider(name = "WorkBookData" ,parallel = true)
+    @DataProvider(name = "WorkBookData" ,parallel = false)
     public Iterator<Object[]> testProvider(ITestContext context) {
         List<Object[]> testIDs = new ArrayList<>();
 

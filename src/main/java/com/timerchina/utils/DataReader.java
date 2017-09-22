@@ -10,12 +10,15 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.log4j.Logger;
 
+
 /**
- * Class that read data from XSSF sheet
- *
+ * The type Data reader.
  */
 public class DataReader {
 
+    /**
+     * The constant logger.
+     */
     protected static final Logger logger = Logger.getLogger(DataReader.class);
 
     private HashMap<String, RecordHandler> map = new HashMap<String, RecordHandler>();
@@ -26,26 +29,29 @@ public class DataReader {
 
     private Integer size = 0;
 
+    /**
+     * Instantiates a new Data reader.
+     */
     public DataReader() {
     }
 
+
     /**
-     * Primary constructor. Uses Apache POI XSSF to pull data from given excel workbook sheet. Data is stored in a
-     * structure depending on the options from other parameters.
+     * Instantiates a new Data reader.
      *
-     * @param sheet Given excel sheet.
-     * @param has_headers Boolean used to specify if the data has a header or not. The headers will be used as field keys.
-     * @param has_key_column Boolean used to specify if the data has a column that should be used for record keys.
-     * @param key_column Integer used to specify the key column for record keys.
+     * @param sheet        the sheet
+     * @param hasHeaders   the has headers
+     * @param hasKeyColumn the has key column
+     * @param keyColumn    the key column
      */
-    public DataReader(XSSFSheet sheet, Boolean has_headers, Boolean has_key_column, Integer key_column) {
+    public DataReader(XSSFSheet sheet, Boolean hasHeaders, Boolean hasKeyColumn, Integer keyColumn) {
 
         XSSFRow myRow = null;
         HashMap<String, String> myList;
         size = 0;
 
-        this.byColumnName = has_headers;
-        this.byRowKey = has_key_column;
+        this.byColumnName = hasHeaders;
+        this.byRowKey = hasKeyColumn;
 
         try {
 
@@ -76,12 +82,12 @@ public class DataReader {
                 }
 
                 if(byRowKey) {
-                    if(myList.size() == 2 && key_column == 0) {
-                        map.put(getSheetCellValue(myRow.getCell(key_column)), new RecordHandler(myList.get(1)));
-                    } else if(myList.size() == 2 && key_column == 1) {
-                        map.put(getSheetCellValue(myRow.getCell(key_column)), new RecordHandler(myList.get(0)));
+                    if(myList.size() == 2 && keyColumn == 0) {
+                        map.put(getSheetCellValue(myRow.getCell(keyColumn)), new RecordHandler(myList.get(1)));
+                    } else if(myList.size() == 2 && keyColumn == 1) {
+                        map.put(getSheetCellValue(myRow.getCell(keyColumn)), new RecordHandler(myList.get(0)));
                     } else {
-                        map.put(getSheetCellValue(myRow.getCell(key_column)), new RecordHandler(myList));
+                        map.put(getSheetCellValue(myRow.getCell(keyColumn)), new RecordHandler(myList));
                     }
                 } else {
                     map.put(Integer.toString(size), new RecordHandler(myList));
@@ -93,11 +99,6 @@ public class DataReader {
         }
     }
 
-    /**
-     * Utility method used for getting an excel cell value. Cell's type is switched to String before accessing.
-     *
-     * @param cell Given excel cell.
-     */
     private String getSheetCellValue(XSSFCell cell) {
 
         String value = "";
@@ -113,21 +114,19 @@ public class DataReader {
     }
 
     /**
-     * Returns entire HashMap containing this class's data.
+     * Gets map.
      *
-     * @return HashMap<String, RecordHandler>, map of ID-Record data.
+     * @return the map
      */
     public HashMap<String, RecordHandler> getMap() {
-
         return map;
     }
 
-
     /**
-     * Gets an entire record.
+     * Gets record.
      *
-     * @param record String key value for record to be returned.
-     * @return HashMap of key-value pairs representing the specified record.
+     * @param record the record
+     * @return the record
      */
     public RecordHandler getRecord(String record) {
 

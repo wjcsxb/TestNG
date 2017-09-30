@@ -35,6 +35,7 @@ public class BaseTest implements ITest {
     static final String EQUAL_TO      = "1";
     static final String HAS_ITEMS     = "2";
     static final String ALL_MATCH     = "3";
+    static final int EXCEPTION_CODE = -100;
 
     //    String filePath = "D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx";
 
@@ -81,7 +82,7 @@ public class BaseTest implements ITest {
         startTime = sf.format(new Date());
     }
 
-    @DataProvider(name = "WorkBookData" ,parallel = false)
+    @DataProvider(name = "WorkBookData" ,parallel = true )
     public Iterator<Object[]> testProvider(ITestContext context) {
         List<Object[]> testIDs = new ArrayList<>();
 

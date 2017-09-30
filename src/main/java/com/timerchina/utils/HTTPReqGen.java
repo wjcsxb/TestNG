@@ -24,13 +24,13 @@ public class HTTPReqGen {
 
     private RequestSpecification reqSpec;
 
-    private String callHost = "";
-    private String callSuffix = "";
-    private String callString = "";
-    private String callType = "";
-    private String body = "";
-    private Map<String, String> headers = new HashMap<String, String>();
-    private HashMap<String, String> cookieList = new HashMap<String, String>();
+    private String                  host        = "";
+    private String                  requestPath = "";
+    private String                  callString  = "";
+    private String                  requestType = "";
+    private String                  body        = "";
+    private Map<String, String>     headers     = new HashMap<>();
+    private HashMap<String, String> cookieList  = new HashMap<>();
 
     public Map<String, String> getHeaders() {
         return headers;
@@ -73,7 +73,7 @@ public class HTTPReqGen {
      * After filling in the template, parses the resulting string in preparation for performing the HTTP request. Expects the
      * the string to be in the following format:
      *
-     * <<callType>> <<callSuffix>>
+     * <<requestType>> <<requestPath>>
      * Host: <<root_host_name>>
      * <<header1_name>>:<<header1_value>>
      * ...
@@ -81,7 +81,7 @@ public class HTTPReqGen {
      *
      * <<body_text>>
      *
-     * <<callType>> must be GET, PUT, POST, or DELETE. <<callSuffix>> must be a string with no spaces. It is appended to
+     * <<requestType>> must be GET, PUT, POST, or DELETE. <<requestPath>> must be a string with no spaces. It is appended to
      * <<root_host_name>> to form the complete call string. After a single blank line is encountered, the rest of the file
      * is used as the body of text for PUT and POST calls. This function also expects the Record Handler to include a field
      * named "VPID" containing a unique record identifier for debugging purposes.
@@ -146,18 +146,18 @@ public class HTTPReqGen {
             // First line should always be call type followed by call suffix
             line = in.readLine();
             lineTokens = line.split(" ");
-            callType = lineTokens[0];
-            callSuffix = lineTokens[1];
+            requestType = lineTokens[0];
+            requestPath = lineTokens[1];
 
             // Second line should contain the host as it's second token
 //            line = in.readLine();
 //            line_tokens = line.split(" ");
-//            callHost = line_tokens[1];
-            callHost = lineTokens[3];
+//            host = line_tokens[1];
+            host = lineTokens[3];
 
             // Full call string for RestAssured will be concatenation of call
             // host and call suffix
-            callString = callHost + callSuffix;
+            callString = host + requestPath;
             callString = callString.substring(5, callString.length());
             // Remaining lines will contain headers, until the read line is
             // empty
@@ -208,7 +208,7 @@ public class HTTPReqGen {
             }
 //            reqSpec.contentType("application/json");
 
-            switch(callType) {
+            switch(requestType) {
 
                 case "GET": {
                     response = reqSpec.get(callString);
@@ -228,7 +228,7 @@ public class HTTPReqGen {
                 }
 
                 default: {
-                    logger.error("Unknown call type: [" + callType + "]");
+                    logger.error("Unknown call type: [" + requestType + "]");
                 }
             }
 

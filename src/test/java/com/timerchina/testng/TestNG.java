@@ -31,14 +31,25 @@ public class TestNG extends BaseTest {
         String url = myInputData.getRecord(ID).get("host") + myInputData.getRecord(ID).get("requestPath");
         String contentType = myInputData.getRecord(ID).get("Content-Type");
 
-        RestAssured.registerParser(contentType, Parser.JSON);
+        RestAssured.registerParser(contentType, Parser.JSON);   //contentType有必要配置？
         String msg = "";
 
         try {
             ValidatableResponse rep = getResponse(url);
-            DataWriter.writeData(outputSheet, ((ValidatableResponseImpl) rep).body().extract().response().asString(), ID, testCase);
+            if(isSuccess(rep)){   //  url是否 404、500等
 
-            msg = getTestMsg(type, expectedResponse, rep);
+                int statusCode = rep.extract().response().path("statusCode");
+                if(EXCEPTION_CODE == statusCode){     //接口是否报异常 （通用接口中程序异常信息也包装在API结果中）
+                    msg = rep.extract().response().path("desc").toString() + rep.extract().response().path("result").toString();
+                    failedCaseNum ++;
+                }else{
+                    DataWriter.writeData(outputSheet, ((ValidatableResponseImpl) rep).body().extract().response().asString(), ID, testCase);
+                    msg = getTestMsg(type, expectedResponse, rep);
+                }
+            }else{
+                msg = successTest(rep);
+            }
+
             //            msg = msg + rep.extract().response().getContentType();
         } catch (Exception e) {
             failedCaseNum++;
@@ -108,7 +119,10 @@ public class TestNG extends BaseTest {
                         }
                         rep.body(strings[0], hasItems(intList.toArray()));
                     } else {
-                        rep.body(strings[0], hasItems(results));
+//                        rep.body(strings[0], hasItems(results));
+                        for(String string : results){
+                            rep.body(strings[0],hasItems(string));
+                        }
                     }
                 } else {
                     failedCaseNum++;
@@ -155,6 +169,12 @@ public class TestNG extends BaseTest {
         }
     }
 
+    /**
+     *
+     * */
+    private boolean isSuccess(ValidatableResponse rep){
+        return rep.extract().response().getStatusCode() == 200;
+    }
     private String getTestMsg(String type, String expectedResponse, ValidatableResponse rep) {
         if (ValidateUtils.isEmpty(type)) {
             failedCaseNum++;

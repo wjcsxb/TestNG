@@ -3,7 +3,8 @@
 
 <suite name="TestAPI" parallel="false" >
     <!--<suite name="TestAPI" parallel="methods" thread-count="5" data-provider-thread-count="10" >-->
-    <parameter name="filePath" value="D:\\project\\TestNG\\src\\test\\resources\\正时统一接口测试报告.xlsx"/>
+    <parameter name="filePath" value="D:\\project\\TestNG\\src\\test\\resources\\通用接口接口测试报告20171219.xlsx"/>
+    <!--<parameter name="filePath" value="D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx"/>-->
     <!--<parameter name="filePath" value="D:\\project\\TestNG\\src\\test\\resources\\debug.xlsx"/>-->
     <!--<parameter name="filePath" value="D:\\project\\TestNG\\src\\test\\resources\\api-test.xlsx"/>-->
     <test name="Test 1">

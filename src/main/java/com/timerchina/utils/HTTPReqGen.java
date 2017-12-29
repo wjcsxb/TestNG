@@ -40,6 +40,10 @@ public class HTTPReqGen {
         return callString;
     }
 
+    public void setCookieList(String key,String value){
+        this.cookieList.put(key, value);
+    }
+
     /**
      * Constructor. Initializes the RequestSpecification (relaxedHTTPSValidation avoids certificate errors).
      *

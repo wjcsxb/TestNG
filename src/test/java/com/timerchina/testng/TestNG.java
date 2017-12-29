@@ -6,6 +6,9 @@ import com.jayway.restassured.internal.ValidatableResponseImpl;
 import com.jayway.restassured.parsing.Parser;
 import com.jayway.restassured.response.ValidatableResponse;
 import org.apache.log4j.Logger;
+import org.skyscreamer.jsonassert.JSONCompare;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.skyscreamer.jsonassert.JSONCompareResult;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
@@ -31,29 +34,40 @@ public class TestNG extends BaseTest {
         String url = myInputData.getRecord(ID).get("host") + myInputData.getRecord(ID).get("requestPath");
         String contentType = myInputData.getRecord(ID).get("Content-Type");
 
-        RestAssured.registerParser(contentType, Parser.JSON);   //contentType有必要配置？
+        RestAssured.registerParser(contentType, Parser.JSON);
         String msg = "";
-
+        String trueContentType = "";
         try {
             ValidatableResponse rep = getResponse(url);
-            if(isSuccess(rep)){   //  url是否 404、500等
+            if(isSuccess(rep)){   //  请求url是200时
 
+                trueContentType = rep.extract().contentType();
                 int statusCode = rep.extract().response().path("statusCode");
                 if(EXCEPTION_CODE == statusCode){     //接口是否报异常 （通用接口中程序异常信息也包装在API结果中）
                     msg = rep.extract().response().path("desc").toString() + rep.extract().response().path("result").toString();
                     failedCaseNum ++;
                 }else{
-                    DataWriter.writeData(outputSheet, ((ValidatableResponseImpl) rep).body().extract().response().asString(), ID, testCase);
-                    msg = getTestMsg(type, expectedResponse, rep);
+//                    DataWriter.writeData(outputSheet, ((ValidatableResponseImpl) rep).body().extract().response().asString(), ID, testCase);
+                    if (ValidateUtils.notEmpty(type)) {
+                        msg = getTestMsg(type, expectedResponse, rep);
+                    }
                 }
+                DataWriter.writeData(outputSheet, ((ValidatableResponseImpl) rep).body().extract().response().asString(), ID, testCase);
             }else{
-                msg = successTest(rep);
+                failedCaseNum++;
+                String status = String.valueOf(rep.extract().response().getStatusCode());
+                msg = status;
             }
 
             //            msg = msg + rep.extract().response().getContentType();
         } catch (Exception e) {
-            failedCaseNum++;
-            msg = msg + " URL请求失败 " + e.getMessage();
+
+            if ("4".equals(type)) {
+                msg = getTestResultByJsonCompare(ID, testCase);
+            } else {
+                failedCaseNum++;
+                msg = msg + " URL请求失败 " + e.getMessage() + trueContentType;
+            }
         }
         DataWriter.writeData(wb, resultSheet, ID, testCase, msg);
     }
@@ -200,4 +214,35 @@ public class TestNG extends BaseTest {
         }
     }
 
+    private String getTestResultByJsonCompare(String id,String testCase) {
+        String msg = "";
+        HTTPReqGen myReqGen = new HTTPReqGen();
+        try {
+            myReqGen.generateRequest(template, myInputData.getRecord(id));
+            response = myReqGen.performRequest();
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            msg = e1.getMessage();
+        }
+        String baselineMessage = myBaselineData.getRecord(id).get("ExpectedResponse");
+        if (response.statusCode() == 200) {
+            try {
+                DataWriter.writeData(outputSheet, response.asString(), id, testCase);
+                baselineMessage = baselineMessage.substring(baselineMessage.indexOf("{"), baselineMessage.lastIndexOf('}') +1);
+                String tmp = response.asString();
+                tmp = tmp.substring(tmp.indexOf("{"),tmp.lastIndexOf('}')+1);
+                JSONCompareResult result = JSONCompare.compareJSON(baselineMessage, tmp, JSONCompareMode.NON_EXTENSIBLE);
+                if (!result.passed()) {
+                    msg = "failure";
+                }
+            } catch (Exception e) {
+                failedCaseNum ++;
+                e.printStackTrace();
+            }
+        } else {
+            failedCaseNum ++;
+            msg = "接口请求失败！";
+        }
+        return msg;
+    }
 }
